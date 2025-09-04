@@ -4,10 +4,12 @@ import {
   $getSelection, 
   $isRangeSelection, 
   $isTextNode,
+  $createTextNode,
   COMMAND_PRIORITY_LOW, 
   KEY_DOWN_COMMAND 
 } from 'lexical';
 import SuggestionsDropdown from './SuggestionsDropdown';
+import { $createAutocompletedEntryNode } from '../nodes/AutocompletedEntryNode';
 
 // Hardcoded suggestions list
 const SUGGESTIONS = [
@@ -113,7 +115,7 @@ export default function AutocompletePlugin(): React.JSX.Element | null {
   const handleSuggestionSelect = (suggestion: string, index: number) => {
     console.log('AutocompletePlugin: Selected suggestion:', suggestion, 'at index:', index);
     
-    // Replace the match string with the selected suggestion in the editor
+    // Replace the match string with an AutocompletedEntryNode
     editor.update(() => {
       const selection = $getSelection();
       
@@ -150,24 +152,33 @@ export default function AutocompletePlugin(): React.JSX.Element | null {
       const triggerEnd = cursorOffset; // Up to current cursor
       const textToReplace = textContent.substring(triggerStart, triggerEnd);
       
-      console.log('AutocompletePlugin: Replacing "' + textToReplace + '" with "' + suggestion + '"');
+      console.log('AutocompletePlugin: Replacing "' + textToReplace + '" with autocompleted entry "' + suggestion + '"');
 
-      // Create new text content
+      // Split the text node and insert the autocompleted entry
       const beforeTrigger = textContent.substring(0, triggerStart);
       const afterCursor = textContent.substring(triggerEnd);
-      const newTextContent = beforeTrigger + suggestion + afterCursor;
       
-      console.log('AutocompletePlugin: New text content:', newTextContent);
-
-      // Replace the text node content
-      anchorNode.setTextContent(newTextContent);
+      // Update the current node with text before the trigger
+      anchorNode.setTextContent(beforeTrigger);
       
-      // Position cursor after the inserted suggestion
-      const newCursorPosition = triggerStart + suggestion.length;
-      selection.anchor.offset = newCursorPosition;
-      selection.focus.offset = newCursorPosition;
+      // Create the autocompleted entry node
+      const autocompletedEntry = $createAutocompletedEntryNode(suggestion);
       
-      console.log('AutocompletePlugin: Cursor positioned at:', newCursorPosition);
+      // Insert the autocompleted entry node after the current text node
+      anchorNode.insertAfter(autocompletedEntry);
+      
+      // If there's text after the cursor, create a new text node for it
+      if (afterCursor.length > 0) {
+        const afterTextNode = $createTextNode(afterCursor);
+        autocompletedEntry.insertAfter(afterTextNode);
+        // Position cursor at the beginning of the after text
+        afterTextNode.select(0, 0);
+      } else {
+        // Position cursor after the autocompleted entry
+        autocompletedEntry.selectNext();
+      }
+      
+      console.log('AutocompletePlugin: Created autocompleted entry node');
     });
     
     // Deactivate autocomplete
@@ -178,6 +189,14 @@ export default function AutocompletePlugin(): React.JSX.Element | null {
       highlightedIndex: 0,
       replacementContext: null
     });
+  };
+
+  // Handle mouse hover highlighting
+  const handleHighlightChange = (index: number) => {
+    setAutocompleteState(prevState => ({
+      ...prevState,
+      highlightedIndex: index
+    }));
   };
 
   useEffect(() => {
@@ -298,6 +317,7 @@ export default function AutocompletePlugin(): React.JSX.Element | null {
       suggestions={autocompleteState.filteredSuggestions}
       highlightedIndex={autocompleteState.highlightedIndex}
       onSuggestionClick={handleSuggestionSelect}
+      onHighlightChange={handleHighlightChange}
       position={{ x: 100, y: 100 }} // Temporary fixed position
     />
   );

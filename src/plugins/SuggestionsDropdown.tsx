@@ -2,6 +2,7 @@ interface SuggestionsDropdownProps {
   suggestions: string[];
   highlightedIndex: number;
   onSuggestionClick: (suggestion: string, index: number) => void;
+  onHighlightChange?: (index: number) => void;
   position?: { x: number; y: number };
 }
 
@@ -9,6 +10,7 @@ export default function SuggestionsDropdown({
   suggestions, 
   highlightedIndex, 
   onSuggestionClick,
+  onHighlightChange,
   position = { x: 0, y: 0 }
 }: SuggestionsDropdownProps): React.JSX.Element | null {
   
@@ -48,7 +50,9 @@ export default function SuggestionsDropdown({
           }}
           onClick={() => onSuggestionClick(suggestion, index)}
           onMouseEnter={() => {
-            // We'll implement mouse hover highlighting later
+            if (onHighlightChange) {
+              onHighlightChange(index);
+            }
             console.log('SuggestionsDropdown: Mouse entered suggestion:', suggestion);
           }}
         >

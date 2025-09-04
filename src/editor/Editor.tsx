@@ -5,10 +5,11 @@ import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
 import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
 import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
 import AutocompletePlugin from '../plugins/AutocompletePlugin';
+import { AutocompletedEntryNode } from '../nodes/AutocompletedEntryNode';
 
 const editorConfig = {
     namespace: 'Editor',
-    nodes: [],
+    nodes: [AutocompletedEntryNode],
     // Handling of errors during update
     onError(error: Error) {
         throw error;
