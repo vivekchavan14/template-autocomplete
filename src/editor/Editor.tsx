@@ -5,6 +5,7 @@ import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
 import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
 import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
 import AutocompletePlugin from '../plugins/AutocompletePlugin';
+import BackspacePlugin from '../plugins/BackspacePlugin';
 import { AutocompletedEntryNode } from '../nodes/AutocompletedEntryNode';
 
 const editorConfig = {
@@ -39,6 +40,7 @@ export default function Editor() {
                     <HistoryPlugin />
                     <AutoFocusPlugin />
                     <AutocompletePlugin />
+                    <BackspacePlugin />
                 </div>
             </div>
         </LexicalComposer>

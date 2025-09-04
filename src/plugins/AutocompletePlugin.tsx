@@ -63,6 +63,43 @@ export default function AutocompletePlugin(): React.JSX.Element | null {
   };
 
   // Function to extract match string from current cursor position
+  // Function to calculate dropdown position relative to cursor
+  const getDropdownPosition = (): { x: number; y: number } => {
+    let position = { x: 100, y: 100 }; // Default fallback position
+
+    try {
+      editor.getEditorState().read(() => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
+          return;
+        }
+
+        // Get the DOM node for the current selection
+        const domSelection = window.getSelection();
+        if (!domSelection || domSelection.rangeCount === 0) {
+          return;
+        }
+
+        // Get the range and create a temporary element to measure position
+        const range = domSelection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        
+        // Position dropdown below the cursor with some offset
+        position = {
+          x: rect.left,
+          y: rect.bottom + 5 // 5px below the cursor
+        };
+        
+        console.log('AutocompletePlugin: Calculated dropdown position:', position);
+      });
+    } catch (error) {
+      console.log('AutocompletePlugin: Error calculating position, using fallback:', error);
+    }
+
+    return position;
+  };
+
+  // Function to extract match string from current cursor position
   const extractMatchString = (): string | null => {
     let matchString: string | null = null;
 
@@ -318,7 +355,7 @@ export default function AutocompletePlugin(): React.JSX.Element | null {
       highlightedIndex={autocompleteState.highlightedIndex}
       onSuggestionClick={handleSuggestionSelect}
       onHighlightChange={handleHighlightChange}
-      position={{ x: 100, y: 100 }} // Temporary fixed position
+      position={getDropdownPosition()}
     />
   );
 }
