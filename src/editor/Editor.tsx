@@ -4,6 +4,7 @@ import {ContentEditable} from '@lexical/react/LexicalContentEditable';
 import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
 import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
 import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
+import AutocompletePlugin from '../plugins/AutocompletePlugin';
 
 const editorConfig = {
     namespace: 'Editor',
@@ -36,9 +37,7 @@ export default function Editor() {
                     />
                     <HistoryPlugin />
                     <AutoFocusPlugin />
-                    {
-                        //Place custom plugins in the ./plugins folder
-                    }
+                    <AutocompletePlugin />
                 </div>
             </div>
         </LexicalComposer>
