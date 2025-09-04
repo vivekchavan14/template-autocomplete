@@ -55,7 +55,7 @@ export class AutocompletedEntryNode extends TextNode {
 
   updateDOM(
     prevNode: AutocompletedEntryNode,
-    dom: HTMLElement,
+    _dom: HTMLElement,
   ): boolean {
     // Return false if the text is the same, true if it changed
     return prevNode.__text !== this.__text;
@@ -63,7 +63,7 @@ export class AutocompletedEntryNode extends TextNode {
 
   static importDOM(): DOMConversionMap | null {
     return {
-      span: (node: Node) => ({
+      span: (_node: Node) => ({
         conversion: convertAutocompletedEntryElement,
         priority: 1,
       }),
@@ -83,7 +83,7 @@ export class AutocompletedEntryNode extends TextNode {
     return $createAutocompletedEntryNode(text);
   }
 
-  exportJSON(): SerializedAutocompletedEntryNode {
+  exportJSON() {
     return {
       ...super.exportJSON(),
       text: this.getTextContent(),
@@ -112,7 +112,7 @@ export class AutocompletedEntryNode extends TextNode {
   }
 }
 
-function convertAutocompletedEntryElement(domNode: Node): DOMConversionOutput {
+function convertAutocompletedEntryElement(domNode: Node): DOMConversionOutput | null {
   const node = domNode as HTMLElement;
   if (node.classList.contains('autocompleted-entry')) {
     return {

@@ -15,8 +15,10 @@ export default function BackspacePlugin(): null {
     // Register backspace command handler with high priority
     const unregister = editor.registerCommand(
       KEY_BACKSPACE_COMMAND,
-      (event: KeyboardEvent) => {
-        return editor.update(() => {
+      (event: KeyboardEvent): boolean => {
+        let handled = false;
+        
+        editor.update(() => {
           const selection = $getSelection();
           
           if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
@@ -43,7 +45,7 @@ export default function BackspacePlugin(): null {
               
               // Prevent default backspace behavior
               event.preventDefault();
-              return true;
+              handled = true;
             }
           }
 
@@ -69,12 +71,11 @@ export default function BackspacePlugin(): null {
             
             // Prevent default backspace behavior
             event.preventDefault();
-            return true;
+            handled = true;
           }
-
-          // Let default backspace behavior handle other cases
-          return false;
         });
+        
+        return handled;
       },
       COMMAND_PRIORITY_HIGH // High priority to intercept before default backspace handling
     );
